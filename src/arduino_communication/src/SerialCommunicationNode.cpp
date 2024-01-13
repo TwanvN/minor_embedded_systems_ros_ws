@@ -29,10 +29,21 @@ private:
 
     void newAxisPositionCallback(const std_msgs::msg::String &msg) {
         RCLCPP_INFO(this->get_logger(), msg.data.c_str());
+
+        std::string charString(1, msg.data.at(0));
+        std::string commandString = "newAxisPos " + charString + " " + msg.data.substr(2, msg.data.size());
+        RCLCPP_INFO(this->get_logger(), commandString.c_str());
+
+        boost::asio::write(this->serial, boost::asio::buffer(commandString));
     }
 
     void homeAxisCallback(const std_msgs::msg::String &msg) {
         RCLCPP_INFO(this->get_logger(), msg.data.c_str());
+
+        std::string commandString = "homeAxis " + msg.data;
+        RCLCPP_INFO(this->get_logger(), commandString.c_str());
+
+        boost::asio::write(this->serial, boost::asio::buffer(commandString));
     }
 
     void gatherDataCallback(const std_msgs::msg::Int8 &msg) {
@@ -64,8 +75,8 @@ public:
             10,
             std::bind(&SerialCommunication::gatherDataCallback, this, _1));
 
-        this->serial.open("/dev/arduino");
-        this->serial.set_option(boost::asio::serial_port_base::baud_rate(115200));
+        // this->serial.open("/dev/arduino");
+        // this->serial.set_option(boost::asio::serial_port_base::baud_rate(115200));
     };
 
     ~SerialCommunication() {}
